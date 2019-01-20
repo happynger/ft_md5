@@ -1,0 +1,18 @@
+{
+	// See https://go.microsoft.com/fwlink/?LinkId=733558
+	// for the documentation about the tasks.json format
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Build Debug",
+			"type": "shell",
+			"command": "mkdir -p ${fileDirname}/../debug;gcc -Wall -Wextra -Werror -g ${fileDirname}/**/*.c -I ${fileDirname}/../includes -L ${fileDirname}/../libft -lft -I ${fileDirname}/../libft/includes -o ${fileDirname}/../debug/a.out",
+			"problemMatcher": "$gcc"
+		},
+		{
+			"label": "CleanUp",
+			"type": "shell",
+			"command": "rm -rf ${fileDirname}/../debug",
+		}
+	]
+}
