@@ -1,26 +1,37 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   main.c                                             :+:      :+:    :+:   */
+/*   command_handler.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ori <ori@student.42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2019/01/18 19:27:44 by ori               #+#    #+#             */
-/*   Updated: 2019/01/20 14:21:37 by ori              ###   ########.fr       */
+/*   Created: 2019/01/20 11:26:32 by ori               #+#    #+#             */
+/*   Updated: 2019/01/20 14:24:55 by ori              ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_ssl.h"
+#include "../includes/ft_ssl.h"
 
-static void	usage(void)
-{
-	ft_printf("{cyan}Usage: ft_ssl command [command opts] [command args]{}");
-	ft_error("\n");
-}
+/*
+**	
+**	Usage: ./ft_ssl command [options] [args]
+**	
+*/
 
-int			main(int ac, char **av)
+void	cmdhandle(char *cmd, char *args)
 {
-	if (ac < 2)
-		usage();
-	cmdhandle(av[1], av[2]);
+	int		i;
+	char	*ret;
+
+	i = 0;
+	while (i < TABLE)
+	{
+		if (!ft_strcmp(g_lookup[i].name, cmd))
+		{
+			ft_printf("%s\n", (ret = g_lookup[i].func(args, ft_strlen(args))));
+			ft_strdel(&ret);
+			break ;
+		}
+		i++;
+	}
 }
