@@ -6,7 +6,7 @@
 /*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/20 12:18:14 by ori               #+#    #+#             */
-/*   Updated: 2019/01/21 17:03:14 by otahirov         ###   ########.fr       */
+/*   Updated: 2019/01/21 17:06:57 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,7 @@ void			ft_md5(uint8_t *i_msg, size_t i_len)
 	n_len = i_len;
 	while (n_len % 64 != 56)
 		n_len++;
-	msg = ft_memalloc(n_len);
+	msg = ft_memalloc(n_len + 64);
 	ft_memcpy(msg, i_msg, i_len);
 	msg[i_len] = 0x80;
 	msg[n_len] = (uint8_t)(i_len / 8);
