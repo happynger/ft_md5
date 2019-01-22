@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: ori <ori@student.42.fr>                    +#+  +:+       +#+         #
+#    By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/01/18 19:28:19 by ori               #+#    #+#              #
-#    Updated: 2019/01/20 14:30:28 by ori              ###   ########.fr        #
+#    Updated: 2019/01/21 14:04:22 by otahirov         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -40,7 +40,7 @@ obj:
 	@mkdir -p $(OBJDIR)/hashes
 
 $(OBJDIR)/%.o:$(SRCDIR)/%.c
-	$(CC) $(CFLAGS) $(INC) $(FT_LINK) $(FT_INC) -o $@ -c $<
+	$(CC) $(CFLAGS) $(INC) $(FT_INC) -o $@ -c $<
 
 $(FT_LIB):
 	@make -C $(FT)

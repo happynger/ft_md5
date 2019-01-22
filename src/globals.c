@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   globals.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ori <ori@student.42.fr>                    +#+  +:+       +#+        */
+/*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/20 14:26:10 by ori               #+#    #+#             */
-/*   Updated: 2019/01/20 14:28:38 by ori              ###   ########.fr       */
+/*   Updated: 2019/01/21 14:15:05 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
 
-u_int32_t			g_origconsts[64] =
+uint32_t			g_origconsts[64] =
 {
 	7, 12, 17, 22,
 	7, 12, 17, 22,
@@ -32,7 +32,7 @@ u_int32_t			g_origconsts[64] =
 	6, 10, 15, 21
 };
 
-u_int32_t			g_consts[64] =
+uint32_t			g_consts[64] =
 {
 	0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 	0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,

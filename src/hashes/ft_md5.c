@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_md5.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ori <ori@student.42.fr>                    +#+  +:+       +#+        */
+/*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/20 12:18:14 by ori               #+#    #+#             */
-/*   Updated: 2019/01/20 14:25:23 by ori              ###   ########.fr       */
+/*   Updated: 2019/01/21 17:03:14 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,104 +18,99 @@
 #define FUNC4(B, C, D) (C ^ (B | (~D)))
 #define LEFTROT(x, c) ((x << c) | (x >> (32 - c)))
 
-static int		setup(size_t i_len, t_hash *ret)
+static void		init(t_mdctx *ctx)
 {
-	int		len;
-
-	ret->a = 0x67452301;
-	ret->b = 0xefcdab89;
-	ret->c = 0x98badcfe;
-	ret->d = 0x10325476;
-	len = i_len * 8 + 1;
-	while (len % 512 != 488)
-		len++;
-	len /= 8;
-	return (len);
+	ctx->len[0] = 0;
+	ctx->len[1] = 0;
+	ctx->state[0] = 0x67452301;
+	ctx->state[1] = 0xefcdab89;
+	ctx->state[2] = 0x98badcfe;
+	ctx->state[3] = 0x10325476;
 }
 
-static void		assign(int f, t_hash *tmp_h, int i, int g, u_int32_t *tmp)
+static void		md5_assign(t_mdctx *ctx, int i, uint64_t h[4], uint32_t *m)
 {
-	f = f + tmp_h->a + g_consts[i] + tmp[g];
-	tmp_h->a = tmp_h->d;
-	tmp_h->d = tmp_h->c;
-	tmp_h->c = tmp_h->b;
-	tmp_h->b = tmp_h->b + LEFTROT(f, g_origconsts[i]);
+	ctx->f = ctx->f + h[0] + g_consts[i] + m[ctx->g];
+	h[0] = h[3];
+	h[3] = h[2];
+	h[2] = h[1];
+	h[1] = h[1] + LEFTROT(ctx->f, g_origconsts[i]);
 }
 
-static void		logic(t_hash *tmp_h, int i, u_int32_t *tmp)
+static void		md5_logic(t_mdctx *ctx, int i, uint64_t h[4], uint32_t *m)
 {
-	int		f;
-	int		g;
-
-	if (i < 15)
+	if (i <= 15)
 	{
-		f = FUNC1(tmp_h->b, tmp_h->c, tmp_h->d);
-		g = i;
+		ctx->f = FUNC1(h[1], h[2], h[3]);
+		ctx->g = i;
 	}
-	else if (i >= 16 && i <= 31)
+	else if (i <= 31)
 	{
-		f = FUNC2(tmp_h->b, tmp_h->c, tmp_h->d);
-		g = (5 * i + 1) % 16;
+		ctx->f = FUNC2(h[1], h[2], h[3]);
+		ctx->g = (5 * i + 1) % 16;
 	}
-	else if (i >= 32 && i <= 47)
+	else if (i <= 47)
 	{
-		f = FUNC3(tmp_h->b, tmp_h->c, tmp_h->d);
-		g = (3 * i + 5) % 16;
+		ctx->f = FUNC3(h[1], h[2], h[3]);
+		ctx->g = (3 * i + 5) % 16;
 	}
 	else
 	{
-		f = FUNC4(tmp_h->b, tmp_h->c, tmp_h->d);
-		g = (7 * i) % 16;
+		ctx->f = FUNC4(h[1], h[2], h[3]);
+		ctx->g = (7 * i) % 16;
 	}
-	assign(f, tmp_h, i, g, tmp);
+	md5_assign(ctx, i, h, m);
 }
 
-static void		breaker(char *msg, t_hash *ret, int len)
+static void		md5_break(t_mdctx *ctx, uint8_t *msg, size_t n_len)
 {
+	uint32_t	m[16];
 	int			off;
-	u_int32_t	*tmp;
-	t_hash		tmp_h;
 	int			i;
+	uint64_t	h[4];
 
 	off = 0;
-	while (off < len)
+	while ((size_t)off < n_len)
 	{
-		i = 0;
-		tmp = (u_int32_t *)(msg + off);
+		i = -1;
+		while (++i < 16)
+			ft_memcpy(&m[i], msg + (i * 4), 4);
+		i = -1;
+		while (++i < 4)
+			h[i] = ctx->state[i];
+		i = -1;
+		while (++i < 63)
+			md5_logic(ctx, i, h, m);
+		i = -1;
+		while (++i < 4)
+			ctx->state[i] += h[i];
 		off += 64;
-		tmp_h.a = ret->a;
-		tmp_h.b = ret->b;
-		tmp_h.c = ret->c;
-		tmp_h.d = ret->d;
-		while (i < 64)
-			logic(&tmp_h, i++, tmp);
-		ret->a += tmp_h.a;
-		ret->b += tmp_h.b;
-		ret->c += tmp_h.c;
-		ret->d += tmp_h.d;
 	}
 }
 
-char			*ft_md5(char *i_msg, size_t i_len)
+void			ft_md5(uint8_t *i_msg, size_t i_len)
 {
-	char		*msg;
-	int			len;
-	t_hash		ret;
-	u_int32_t	bits;
-	char		*tmp[2];
+	t_mdctx		ctx;
+	uint8_t		*msg;
+	size_t		n_len;
+	uint8_t		digest[16];
+	int			i;
 
-	len = setup(i_len, &ret);
-	msg = (char *)ft_memalloc((len + 64) * sizeof(char));
+	init(&ctx);
+	n_len = i_len;
+	while (n_len % 64 != 56)
+		n_len++;
+	msg = ft_memalloc(n_len);
 	ft_memcpy(msg, i_msg, i_len);
 	msg[i_len] = 0x80;
-	bits = i_len * 8;
-	ft_memcpy(msg + len, &bits, 4);
-	breaker(msg, &ret, len);
-	tmp[0] = ft_strjoin((char *)&ret.a, (char *)&ret.b);
-	tmp[1] = ft_strjoin(tmp[0], (char *)&ret.c);
-	ft_strdel(&tmp[0]);
-	tmp[0] = ft_strjoin(tmp[1], (char *)&ret.d);
-	ft_strdel(&tmp[1]);
-	ft_strdel(&msg);
-	return (tmp[0]);
+	msg[n_len] = (uint8_t)(i_len / 8);
+	md5_break(&ctx, msg, n_len);
+	md5_put(ctx.state[0], digest);
+	md5_put(ctx.state[1], digest + 4);
+	md5_put(ctx.state[2], digest + 8);
+	md5_put(ctx.state[3], digest + 12);
+	i = -1;
+	while (++i < 16)
+		ft_printf("%02x", (uint32_t)digest[i]);
+	ft_printf("\n");
 }

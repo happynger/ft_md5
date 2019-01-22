@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ft_ssl.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ori <ori@student.42.fr>                    +#+  +:+       +#+        */
+/*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 19:25:48 by ori               #+#    #+#             */
-/*   Updated: 2019/01/20 14:28:51 by ori              ###   ########.fr       */
+/*   Updated: 2019/01/21 16:57:14 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,25 +15,26 @@
 
 # include	"libft.h"
 
-char				*ft_md5(char *i_msg, size_t i_len);
+void				ft_md5(uint8_t *i_msg, size_t i_len);
 void				cmdhandle(char *cmd, char *args);
+void				md5_put(uint32_t data, uint8_t *addr);
 
 typedef struct		s_ssl_table
 {
 	const char		*name;
-	char			*(*func)(char *, size_t);
+	void			(*func)(uint8_t *, size_t);
 }					t_ssl_table;
 
-typedef struct		s_hash
+typedef struct		s_mdctx
 {
-	uint32_t		a;
-	uint32_t		b;
-	uint32_t		c;
-	uint32_t		d;
-}					t_hash;
+	uint64_t		state[4];
+	uint64_t		len[2];
+	uint32_t		f;
+	uint32_t		g;
+}					t_mdctx;
 
-extern u_int32_t	g_origconsts[64];
-extern u_int32_t	g_consts[64];
+extern uint32_t	g_origconsts[64];
+extern uint32_t	g_consts[64];
 extern t_ssl_table	g_lookup[];
 # define TABLE 1
 
