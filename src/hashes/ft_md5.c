@@ -6,65 +6,56 @@
 /*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/20 12:18:14 by ori               #+#    #+#             */
-/*   Updated: 2019/01/21 17:26:05 by otahirov         ###   ########.fr       */
+/*   Updated: 2019/01/22 16:52:44 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
 
-#define FUNC1(B, C, D) ((B & C) | ((~B) & D))
-#define FUNC2(B, C, D) ((D & B) | ((~D) & C))
-#define FUNC3(B, C, D) (B ^ C ^ D)
-#define FUNC4(B, C, D) (C ^ (B | (~D)))
-#define LEFTROT(x, c) ((x << c) | (x >> (32 - c)))
-
 static void		init(t_mdctx *ctx)
 {
-	ctx->len[0] = 0;
-	ctx->len[1] = 0;
 	ctx->state[0] = 0x67452301;
 	ctx->state[1] = 0xefcdab89;
 	ctx->state[2] = 0x98badcfe;
 	ctx->state[3] = 0x10325476;
 }
 
-static void		md5_assign(t_mdctx *ctx, int i, uint64_t h[4], uint32_t *m)
+static uint32_t	leftrotate(uint32_t v, uint16_t amt)
 {
-	ctx->f = ctx->f + h[0] + g_consts[i] + m[ctx->g];
-	h[0] = h[3];
-	h[3] = h[2];
-	h[2] = h[1];
-	h[1] = h[1] + LEFTROT(ctx->f, g_origconsts[i]);
+	uint32_t	msk;
+
+	msk = (1 << amt) - 1;
+	return (((v >> (32 - amt)) & msk) | ((v << amt) & ~msk));
 }
 
-static void		md5_logic(t_mdctx *ctx, int i, uint64_t h[4], uint32_t *m)
+static void		md5_logic(int i, uint64_t h[4], uint32_t *mb)
 {
-	if (i <= 15)
+	md5ff			fct;
+	const uint16_t	*rot;
+	uint16_t		m[2];
+	uint64_t		g[2];
+	int				j;
+
+	fct = g_ff[i];
+	rot = g_rot[i];
+	m[0] = g_m[i];
+	m[1] = g_o[i];
+	j = -1;
+	while (++j < 16)
 	{
-		ctx->f = FUNC1(h[1], h[2], h[3]);
-		ctx->g = i;
+		g[0] = (m[0] * j + m[1]) % 16;
+		g[1] = h[1] + leftrotate(h[0] + fct(h) + g_consts[j + 16 * i] +
+			mb[g[0]], rot[j % 4]);
+		h[0] = h[3];
+		h[3] = h[2];
+		h[2] = h[1];
+		h[1] = g[1];
 	}
-	else if (i <= 31)
-	{
-		ctx->f = FUNC2(h[1], h[2], h[3]);
-		ctx->g = (5 * i + 1) % 16;
-	}
-	else if (i <= 47)
-	{
-		ctx->f = FUNC3(h[1], h[2], h[3]);
-		ctx->g = (3 * i + 5) % 16;
-	}
-	else
-	{
-		ctx->f = FUNC4(h[1], h[2], h[3]);
-		ctx->g = (7 * i) % 16;
-	}
-	md5_assign(ctx, i, h, m);
 }
 
 static void		md5_break(t_mdctx *ctx, uint8_t *msg, size_t n_len)
 {
-	uint32_t	m[16];
+	t_md5		m;
 	int			off;
 	int			i;
 	uint64_t	h[4];
@@ -72,15 +63,13 @@ static void		md5_break(t_mdctx *ctx, uint8_t *msg, size_t n_len)
 	off = 0;
 	while ((size_t)off < n_len)
 	{
-		i = -1;
-		while (++i < 16)
-			ft_memcpy(&m[i], msg + (i * 4), 4);
+		ft_memcpy(m.b, msg + off, 64);
 		i = -1;
 		while (++i < 4)
 			h[i] = ctx->state[i];
 		i = -1;
-		while (++i < 63)
-			md5_logic(ctx, i, h, m);
+		while (++i < 4)
+			md5_logic(i, h, m.m);
 		i = -1;
 		while (++i < 4)
 			ctx->state[i] += h[i];
@@ -93,25 +82,28 @@ void			ft_md5(uint8_t *i_msg, size_t i_len)
 	t_mdctx		ctx;
 	uint8_t		*msg;
 	size_t		n_len;
-	uint8_t		digest[16];
-	int			i;
+	int			i[2];
 
 	init(&ctx);
-	n_len = i_len;
-	while (n_len % 64 != 56)
-		n_len++;
-	msg = ft_memalloc(n_len + 64);
+	n_len = 1 + (i_len * 8) / 64;
+	msg = ft_memalloc(n_len * 64);
 	ft_memcpy(msg, i_msg, i_len);
 	msg[i_len] = 0x80;
-	md5_put(i_len * 8, msg + n_len);
-	md5_put(n_len * 8, msg + n_len + 4);
+	i[0] = i_len + 1;
+	while ((size_t)i[0] < n_len * 64)
+	{
+		ctx.j = 8 * i_len;
+		i[0] -= 8;
+		ft_memcpy(msg + i[0], &ctx.j, 4);
+	}
 	md5_break(&ctx, msg, n_len);
-	md5_put(ctx.state[0], digest);
-	md5_put(ctx.state[1], digest + 4);
-	md5_put(ctx.state[2], digest + 8);
-	md5_put(ctx.state[3], digest + 12);
-	i = -1;
-	while (++i < 16)
-		ft_printf("%02x", (uint32_t)digest[i]);
+	i[0] = -1;
+	while (++i[0] < 4)
+	{
+		ctx.wb.w = ctx.state[i[0]];
+		i[1] = -1;
+		while (++i[1] < 4)
+			ft_printf("%02x", ctx.wb.b[i[1]]);
+	}
 	ft_printf("\n");
 }

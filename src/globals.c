@@ -6,33 +6,48 @@
 /*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/20 14:26:10 by ori               #+#    #+#             */
-/*   Updated: 2019/01/21 14:15:05 by otahirov         ###   ########.fr       */
+/*   Updated: 2019/01/22 16:51:01 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
 
-uint32_t			g_origconsts[64] =
+const uint16_t		g_rot0[] =
 {
-	7, 12, 17, 22,
-	7, 12, 17, 22,
-	7, 12, 17, 22,
-	7, 12, 17, 22,
-	5, 9, 14, 20,
-	5, 9, 14, 20,
-	5, 9, 14, 20,
-	5, 9, 14, 20,
-	4, 11, 16, 23,
-	4, 11, 16, 23,
-	4, 11, 16, 23,
-	4, 11, 16, 23,
-	6, 10, 15, 21,
-	6, 10, 15, 21,
-	6, 10, 15, 21,
+	7, 12, 17, 22
+};
+
+const uint16_t		g_rot1[] =
+{
+	5,  9, 14, 20
+};
+
+const uint16_t		g_rot2[] =
+{
+	4, 11, 16, 23
+};
+
+const uint16_t		g_rot3[] =
+{
 	6, 10, 15, 21
 };
 
-uint32_t			g_consts[64] =
+const uint16_t		*g_rot[] =
+{
+	g_rot0, g_rot1, g_rot2, g_rot3
+};
+
+const uint16_t		g_m[] =
+{
+	1, 5, 3, 7
+};
+
+const uint16_t		g_o[] =
+{
+	0, 1, 5, 0
+};
+
+const uint32_t		g_consts[64] =
 {
 	0xd76aa478, 0xe8c7b756, 0x242070db, 0xc1bdceee,
 	0xf57c0faf, 0x4787c62a, 0xa8304613, 0xfd469501,
@@ -55,4 +70,12 @@ uint32_t			g_consts[64] =
 t_ssl_table			g_lookup[] =
 {
 	{"md5", ft_md5}
+};
+
+const md5ff			g_ff[] =
+{
+	f0,
+	f1,
+	f2,
+	f3
 };
