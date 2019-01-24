@@ -6,7 +6,7 @@
 /*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/20 11:26:32 by ori               #+#    #+#             */
-/*   Updated: 2019/01/21 14:49:15 by otahirov         ###   ########.fr       */
+/*   Updated: 2019/01/23 13:46:56 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ void	cmdhandle(char *cmd, char *args)
 	int		i;
 
 	i = 0;
-	while (i < TABLE)
+	while (g_lookup[i].name != NULL)
 	{
 		if (!ft_strcmp(g_lookup[i].name, cmd))
 		{

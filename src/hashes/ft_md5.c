@@ -6,11 +6,12 @@
 /*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/20 12:18:14 by ori               #+#    #+#             */
-/*   Updated: 2019/01/22 16:52:44 by otahirov         ###   ########.fr       */
+/*   Updated: 2019/01/23 12:31:02 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_ssl.h"
+#include "ft_md5.h"
 
 static void		init(t_mdctx *ctx)
 {
@@ -44,7 +45,7 @@ static void		md5_logic(int i, uint64_t h[4], uint32_t *mb)
 	while (++j < 16)
 	{
 		g[0] = (m[0] * j + m[1]) % 16;
-		g[1] = h[1] + leftrotate(h[0] + fct(h) + g_consts[j + 16 * i] +
+		g[1] = h[1] + leftrotate(h[0] + fct(h) + g_md5consts[j + 16 * i] +
 			mb[g[0]], rot[j % 4]);
 		h[0] = h[3];
 		h[3] = h[2];
@@ -89,13 +90,9 @@ void			ft_md5(uint8_t *i_msg, size_t i_len)
 	msg = ft_memalloc(n_len * 64);
 	ft_memcpy(msg, i_msg, i_len);
 	msg[i_len] = 0x80;
-	i[0] = i_len + 1;
-	while ((size_t)i[0] < n_len * 64)
-	{
-		ctx.j = 8 * i_len;
-		i[0] -= 8;
-		ft_memcpy(msg + i[0], &ctx.j, 4);
-	}
+	i[0] = n_len * 64 - 8;
+	ctx.j = 8 * i_len;
+	ft_memcpy(msg + i[0], &ctx.j, 4);
 	md5_break(&ctx, msg, n_len);
 	i[0] = -1;
 	while (++i[0] < 4)
