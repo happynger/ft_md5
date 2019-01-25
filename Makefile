@@ -6,7 +6,7 @@
 #    By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/01/18 19:28:19 by ori               #+#    #+#              #
-#    Updated: 2019/01/21 14:04:22 by otahirov         ###   ########.fr        #
+#    Updated: 2019/01/25 10:08:40 by otahirov         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,6 +20,7 @@ OBJDIR		= ./obj
 SRC			= command_handler.c \
 			  main.c \
 			  globals.c \
+			  printer.c \
 			  $(addprefix hashes/,$(shell ls $(HASHDIR)/ | grep -E ".+\.c"))
 
 OBJ			= $(addprefix $(OBJDIR)/,$(SRC:.c=.o))

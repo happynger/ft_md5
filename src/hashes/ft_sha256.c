@@ -6,14 +6,14 @@
 /*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/23 12:24:48 by otahirov          #+#    #+#             */
-/*   Updated: 2019/01/23 15:27:11 by otahirov         ###   ########.fr       */
+/*   Updated: 2019/01/24 17:38:36 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_sha256.h"
 
-#define F1(w) (rotright(w, 7) ^ rotright(w, 18) ^ rotright(w, 3))
-#define F2(w) (rotright(w, 17) ^ rotright(w, 19) ^ rotright(w, 10))
+#define F1(w) (rotright(w,  7) ^ rotright(w, 18) ^ (w >>  3))
+#define F2(w) (rotright(w, 17) ^ rotright(w, 19) ^ (w >> 10))
 
 #define L1(x) (rotright(x, 6) ^ rotright(x, 11) ^ rotright(x, 25))
 #define L2(e, f, g) ((e & f) ^ (~e & g))
@@ -48,10 +48,10 @@ static void	sha_init(t_shactx *ctx, uint32_t len)
 static void	ft_shalogic(t_shactx *ctx)
 {
 	int			i;
-	uint32_t	s[2];
-	uint32_t	ch;
-	uint32_t	tmp[2];
-	uint32_t	maj;
+	uint64_t	s[2];
+	uint64_t	ch;
+	uint64_t	tmp[2];
+	uint64_t	maj;
 
 	i = -1;
 	while (++i < 64)
@@ -77,7 +77,7 @@ static void	ft_shadigest(t_shactx *ctx, uint8_t *msg)
 {
 	uint32_t	off;
 	int			i;
-	uint32_t	tmp[2];
+	uint64_t	tmp[2];
 
 	off = -64;
 	while ((off += 64) < ctx->len)
@@ -100,43 +100,29 @@ static void	ft_shadigest(t_shactx *ctx, uint8_t *msg)
 	}
 }
 
-static void	ft_shaprint(t_shactx *ctx)
+uint64_t	*ft_sha256(uint8_t *i_msg, uint64_t i_len)
 {
-	int			i;
-	int			j;
-	t_shawb		wb;
-	uint32_t	bigend[8];
-
-	i = -1;
-	while (++i < 8)
-		bigend[i] = changeendian(ctx->h[i]);
-	i = -1;
-	while (++i < 8)
-	{
-		wb.w = bigend[i];
-		j = -1;
-		while (++j < 8)
-			ft_printf("%02x", wb.b[j]);
-	}
-	ft_printf("\n");
-}
-
-void		ft_sha256(uint8_t *i_msg, size_t i_len)
-{
-	uint32_t	len;
+	uint64_t	len;
 	uint8_t		*msg;
 	t_shactx	ctx;
-	uint64_t	bigendlen;
+	uint64_t	bits;
+	uint64_t	*result;
 
 	len = 0;
 	while ((len + 1 + (i_len << 3) + 64) % 512 != 0)
 		len++;
-	msg = ft_memalloc((len >> 3) + i_len);
+	msg = ft_memalloc((len >> 3) + i_len + 8 + 1);
 	ft_memcpy(msg, i_msg, i_len);
 	msg[i_len] = 0x80;
 	sha_init(&ctx, len);
-	bigendlen = changeendian(i_len);
-	ft_memcpy(msg + (len >> 3) - 8, &bigendlen, 8);
+	bits = i_len << 3;
+	bits = get_endian(&bits, 8);
+	ft_memcpy(msg + (len >> 3) + i_len + 1, &bits, 8);
 	ft_shadigest(&ctx, msg);
-	ft_shaprint(&ctx);
+	ft_memdel((void **)&msg);
+	len = -1;
+	result = ft_memalloc(8 * sizeof(uint64_t));
+	while (++len < 8)
+		result[len] = ctx.h[len];
+	return (result);
 }

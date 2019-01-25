@@ -6,7 +6,7 @@
 /*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/20 12:18:14 by ori               #+#    #+#             */
-/*   Updated: 2019/01/23 12:31:02 by otahirov         ###   ########.fr       */
+/*   Updated: 2019/01/25 12:27:00 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,29 +78,29 @@ static void		md5_break(t_mdctx *ctx, uint8_t *msg, size_t n_len)
 	}
 }
 
-void			ft_md5(uint8_t *i_msg, size_t i_len)
+uint64_t		*ft_md5(uint8_t *i_msg, uint64_t i_len)
 {
 	t_mdctx		ctx;
 	uint8_t		*msg;
 	size_t		n_len;
-	int			i[2];
+	uint64_t	*result;
+	int			i;
 
 	init(&ctx);
-	n_len = 1 + (i_len * 8) / 64;
-	msg = ft_memalloc(n_len * 64);
+	n_len = i_len;
+	while ((n_len * 8) % 512 != 448)
+		n_len++;
+	msg = ft_memalloc(n_len + 64);
 	ft_memcpy(msg, i_msg, i_len);
 	msg[i_len] = 0x80;
-	i[0] = n_len * 64 - 8;
+	i = 64 * ((n_len / 64) + 1) - 8;
 	ctx.j = 8 * i_len;
-	ft_memcpy(msg + i[0], &ctx.j, 4);
+	ft_memcpy(msg + i, &ctx.j, 4);
 	md5_break(&ctx, msg, n_len);
-	i[0] = -1;
-	while (++i[0] < 4)
-	{
-		ctx.wb.w = ctx.state[i[0]];
-		i[1] = -1;
-		while (++i[1] < 4)
-			ft_printf("%02x", ctx.wb.b[i[1]]);
-	}
-	ft_printf("\n");
+	ft_memdel((void **)&msg);
+	result = ft_memalloc(4 * sizeof(uint64_t));
+	i = -1;
+	while (++i < 4)
+		result[i] = ctx.state[i];
+	return (result);
 }
