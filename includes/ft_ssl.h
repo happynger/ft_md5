@@ -6,7 +6,7 @@
 /*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 19:25:48 by ori               #+#    #+#             */
-/*   Updated: 2019/01/25 13:23:14 by otahirov         ###   ########.fr       */
+/*   Updated: 2019/01/28 17:33:31 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 # define FT_SSL_H
 
 # include	"libft.h"
-# define	BUFF_SIZE 1028
+# define	BUFF_SIZE 512
 
 typedef enum			e_ehash
 {
@@ -37,15 +37,17 @@ typedef struct			s_ssl_table
 
 uint64_t				*ft_md5(uint8_t *i_msg, uint64_t i_len);
 uint64_t				*ft_sha256(uint8_t *i_msg, uint64_t i_len);
-void					cmdhandle(char *cmd, char *args);
-void					filehandle(char *cmd, char *name);
+void					cmdhandle(char *cmd, char *args, char *name);
+int						filehandle(char *cmd, char *name);
 void					stdinhandle(char *cmd);
+void					print_stdin(char *input, uint64_t *output,
+							t_ehash hash);
 void					print_handler(t_ehash hash,
 							char *input, uint64_t *output);
 void					print_error(char *in);
 void					set_glob(void);
-void					print_efile(char *name, char *cmd);
+int						print_efile(char *name, char *cmd);
 extern t_ssl_table		g_lookup[];
-extern bool				g_sslflags[];
+extern bool				g_sslf[];
 
 #endif

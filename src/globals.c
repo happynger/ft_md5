@@ -6,7 +6,7 @@
 /*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/20 14:26:10 by ori               #+#    #+#             */
-/*   Updated: 2019/01/25 13:22:46 by otahirov         ###   ########.fr       */
+/*   Updated: 2019/01/28 17:13:55 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,10 +96,12 @@ t_ssl_table			g_lookup[] =
 **	g_flag[2] =>> -r (Reverse mode)
 **	g_flag[3] =>> -s (String mode)
 **	g_flag[4] =>> -n (No Color)
+**	g_flag[5] =>> FILES
 */
 
-bool				g_sslflags[] =
+bool				g_sslf[] =
 {
+	false,
 	false,
 	false,
 	false,
@@ -128,6 +130,6 @@ void				set_glob(void)
 	int	i;
 
 	i = -1;
-	while (++i < 5)
+	while (++i < 6)
 		g_flags[i] = false;
 }

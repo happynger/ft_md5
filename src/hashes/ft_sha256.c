@@ -6,7 +6,7 @@
 /*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/23 12:24:48 by otahirov          #+#    #+#             */
-/*   Updated: 2019/01/24 17:38:36 by otahirov         ###   ########.fr       */
+/*   Updated: 2019/01/28 17:40:19 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,7 +114,7 @@ uint64_t	*ft_sha256(uint8_t *i_msg, uint64_t i_len)
 	msg = ft_memalloc((len >> 3) + i_len + 8 + 1);
 	ft_memcpy(msg, i_msg, i_len);
 	msg[i_len] = 0x80;
-	sha_init(&ctx, len);
+	sha_init(&ctx, len + 1 + (i_len << 3) + 64);
 	bits = i_len << 3;
 	bits = get_endian(&bits, 8);
 	ft_memcpy(msg + (len >> 3) + i_len + 1, &bits, 8);
