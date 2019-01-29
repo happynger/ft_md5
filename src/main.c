@@ -6,7 +6,7 @@
 /*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/18 19:27:44 by ori               #+#    #+#             */
-/*   Updated: 2019/01/28 17:14:19 by otahirov         ###   ########.fr       */
+/*   Updated: 2019/01/28 18:03:23 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,18 @@ static void	handle(char *cmd, char *args)
 int			main(int ac, char **av)
 {
 	int		i;
+	bool	h;
 
 	if (ac < 2)
 		usage();
 	set_glob();
+	i = -1;
+	h = false;
+	while (g_lookup[++i].name != NULL)
+		if (!ft_strcmp(g_lookup[i].name, av[1]))
+			h = true;
+	if (!h)
+		print_error(av[1]);
 	i = 1;
 	while (++i < ac)
 	{

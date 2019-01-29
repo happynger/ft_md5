@@ -6,7 +6,7 @@
 /*   By: otahirov <otahirov@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/01/28 15:02:14 by otahirov          #+#    #+#             */
-/*   Updated: 2019/01/28 17:17:18 by otahirov         ###   ########.fr       */
+/*   Updated: 2019/01/28 18:03:17 by otahirov         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,7 @@ void			print_error(char *in)
 		ft_printf("Message Digest commands:\nmd5\nsha256\n\n");
 		ft_printf("Cipher commands:\n");
 	}
+	ft_error(NULL);
 }
 
 int				print_efile(char *name, char *cmd)
